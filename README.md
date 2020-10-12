@@ -8,7 +8,7 @@ for example, to ensure that a socket's accept function is only called on a socke
 after bind is called, or other such invariants.
 
 
-I attempted this four times, and I will write up each attempt briefly 
+I attempted this five times, and I will write up each attempt briefly 
 for future reference.
 
 
@@ -48,7 +48,7 @@ I could use anytype, but that appears to only work in arguments? I couldn't get 
 work.
 
 
-## fourth\_attempt.zig
+## fourth\_attempt.zig (Comptime Fields)
 This was an interesting one. I thought I might be able to hide the type information inside
 the structure, keeping it from appearing in the type at all. Then, I would just have to
 add comptime block with assertions to enforce type invariants for state transitions.
@@ -70,6 +70,20 @@ I made [issue 6656](https://github.com/ziglang/zig/issues/6656) asking if this s
 work or not, and pointing out that the value appears to be set, and compiles, but that the
 comptime field does not use this value. We will see how the issue plays out, but I am
 leaving this repo as-is for now until another solution presents itself.
+
+## fifth\_attempt.zig (Comptime Functions)
+This attempt involved a function that transitions between states. The idea was to
+define an 'input' type and 'state' type, and to be able to map states to
+states depending on a comptime input. Then functions could be defined to take
+comptime inputs, or use fixed inputs, and encode transitions that way.
+
+
+I ran into an issue where the compiler reports "unable to evaluate constant expression",
+and I don't know why. All the inputs should be constant, and making the function
+trivial does not help. Its a complex encoding anyway, and I would have wanted to
+wrap it up in some kind of interface anyway, but it doesn't seem to work. This is
+one that might be worth getting back to once the stage2 compiler is in use in
+case comptime changes or the error messages are more expressive.
 
 
 ## Conclusion
